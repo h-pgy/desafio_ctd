@@ -5,29 +5,12 @@ from typing import Optional
 from api.models import Record
 from api.utils import get_data
 from api.questoes import questao_1, questao_2, questao_3, questao_4
-from api.models import Record, Record_model
-from api.database import SessionLocal, Base, engine
+from api.models import Record
+from api.database import create_record
 
 
 app = FastAPI()
-Base.metadata.create_all(engine)
 df = get_data()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-def create_record(db: Session, record: Record):
-
-    item = Record_model(**record.dict())
-    db.add(item)
-    db.commit()
-    db.refresh(item)
-    return item
 
 
 @app.get("/questao_1/{ano}")
@@ -70,8 +53,8 @@ async def questao_4_endpoint():
 
 @app.post("/questao_5/")
 async def questao_5_endpoint(record: Record):
-    db = get_db()
-    return create_record(next(db), record)
+    
+    return create_record(record)
 
 
 
